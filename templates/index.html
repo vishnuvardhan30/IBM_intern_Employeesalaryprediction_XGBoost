@@ -459,23 +459,27 @@
                     <p id="result-text">Awaiting prediction...</p>
                 </div>
                 <div class="model-details">
-                    <h3>XGBoost Model Details</h3>
+                    <h3>XGBoost Model Evaluation Summary(Weighted Average)</h3>
                     <div class="model-stats">
                         <div class="stat">
-                            <h4>94.2%</h4>
+                            <h4>0.80</h4>
                             <p>Accuracy</p>
                         </div>
                         <div class="stat">
-                            <h4>0.892</h4>
+                            <h4>0.81</h4>
                             <p>F1-Score</p>
                         </div>
                         <div class="stat">
-                            <h4>91.5%</h4>
+                            <h4>0.83</h4>
                             <p>Precision</p>
                         </div>
                         <div class="stat">
-                            <h4>89.8%</h4>
+                            <h4>0.80</h4>
                             <p>Recall</p>
+                        </div>
+                         <div class="stat">
+                            <h4>0.87</h4>
+                            <p>ROC AUC Score</p>
                         </div>
                     </div>
                     <p>This model is trained on the UCI Adult dataset with over 32,000 samples using advanced XGBoost algorithm. It analyzes demographic and employment factors to predict income classification with high accuracy.</p>
@@ -487,19 +491,19 @@
                     <div class="slides-wrapper" id="slides-wrapper">
                         <div class="slide">
                             <img src="/static/images/feature importance.jpg" alt="Feature Importance">
-                            <div class="slide-text">📊 Feature Importance: Age and Education are the most influential factors, contributing 35% and 28% respectively to salary predictions. Hours worked per week ranks third at 18% importance.</div>
+                            <div class="slide-text">📊 This bar chart ranks the features based on their contribution to the model's decisions. Features like age, hours-per-week, and occupation are the most influential in predicting the target variable, providing valuable insight into which attributes the model relies on most.</div>
                         </div>
                         <div class="slide">
                             <img src="/static/images/confusion matrix.jpg" alt="Confusion Matrix">
-                            <div class="slide-text">📈 Confusion Matrix: Shows the model's performance in classifying income levels, with high true positive and true negative rates, indicating robust prediction accuracy.</div>
+                            <div class="slide-text">📈 This matrix shows the performance of a classification model by comparing predicted labels with actual labels. The model correctly predicted 5382 true negatives and 1736 true positives, while misclassifying 1273 instances as false positives and 500 as false negatives, indicating overall good accuracy and balanced performance.</div>
                         </div>
                         <div class="slide">
                             <img src="/static/images/precision recall.jpg" alt="Precision-Recall Curve">
-                            <div class="slide-text">🎯 Precision-Recall Curve: Demonstrates excellent precision-recall balance, with an area under the curve of 0.892, highlighting model reliability.</div>
+                            <div class="slide-text">🎯 The precision-recall curve shows the trade-off between precision and recall at different thresholds. The curve maintains high precision even at lower recall levels, suggesting that the model performs well in identifying the positive class, especially important in imbalanced datasets.</div>
                         </div>
                         <div class="slide">
                             <img src="/static/images/ROC curve.jpg" alt="ROC Curve">
-                            <div class="slide-text">🔍 ROC Curve: Illustrates the trade-off between sensitivity and specificity, with an AUC of 0.94, indicating strong discriminative ability.</div>
+                            <div class="slide-text">🔍 The ROC (Receiver Operating Characteristic) curve demonstrates the model’s diagnostic ability. It plots the true positive rate against the false positive rate and shows a curve that rises steeply toward the top-left, indicating that the model distinguishes well between classes, with a likely high AUC (Area Under Curve).</div>
                         </div>
                     </div>
                     <span class="arrow arrow-left" onclick="changeSlide(-1)">‹</span>
