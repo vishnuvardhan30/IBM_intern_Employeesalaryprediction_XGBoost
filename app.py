@@ -307,4 +307,4 @@ if __name__ == '__main__':
         print("⚠️  Some model files are missing. Predictions may fail.")
     
     print("Starting Flask server...")
-    app.run(host='0.0.0.0', port=5000)
+    app.run()
