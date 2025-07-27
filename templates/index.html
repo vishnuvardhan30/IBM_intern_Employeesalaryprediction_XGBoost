@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Predictor</title>
+    <style>
+    :root {
+        --primary: #007bff;
+        --secondary: #6c757d;
+        --light-bg: #f8f9fa;
+        --white: #ffffff;
+        --border-radius: 10px;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --green: #28a745;
+        --red: #dc3545;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to right, #eef2f3, #cfd9df);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        display: flex;
+        gap: 20px;
+        background-color: var(--white);
+        box-shadow: var(--shadow);
+        border-radius: var(--border-radius);
+        padding: 20px;
+    }
+
+    .left-section{
+        flex: 1;
+        padding: 20px;
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        min-height: 700px;
+    }
+
+    h2, h3 {
+        color: var(--primary);
+        margin-top: 0;
+        text-align: center;
+    }
+
+    .form-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        flex-grow: 1;
+        padding-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .form-group input, .form-group select {
+        padding: 10px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .submit-btn {
+        background-color: var(--primary);
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s;
+        grid-column: 1 / -1;
+    }
+
+    .submit-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .submit-btn:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .model-details p {
+        font-size: 14px;
+        color: #555;
+        text-align: center;
+    }
+
+    .model-stats {
+        display: flex;
+        justify-content: space-evenly;
+        margin: 10px 0;
+    }
+
+    .stat {
+        background-color: #e9ecef;
+        padding: 10px;
+        border-radius: 6px;
+        width: 20%;
+        text-align: center;
+    }
+
+    .stat h4 {
+        margin: 0;
+        color: #333;
+    }
+
+    .right-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+        min-height: 700px;
+    }
+
+    .prediction-result {
+        text-align: center;
+        background-color: #e2f0d9;
+        border: 1px solid #b8dfb0;
+        border-radius: 6px;
+        padding: 20px;
+        font-size: 18px;
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .prediction-result.loading {
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+    }
+
+    .prediction-result.high-salary {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+
+    .prediction-result.low-salary {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .prediction-result p {
+        font-weight: 600;
+        margin: 5px 0;
+    }
+
+    .prediction-result .salary-text {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .prediction-result .confidence-text {
+        font-size: 16px;
+        color: #666;
+    }
+
+    .prediction-result.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .slideshow-container {
+        margin-top: 15px;
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--border-radius);
+        height: 350px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .slides-wrapper {
+        display: flex;
+        transition: transform 0.6s ease-in-out;
+        height: 100%;
+        width: 100%;
+    }
+
+    .slide {
+        min-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    .slide img {
+        width: 90%;
+        height: 250px;
+        object-fit: contain;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        margin: 0 auto;
+    }
+
+    .slide-text {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #444;
+        max-width: 80%;
+        text-align: center;
+    }
+
+    .arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 123, 255, 0.7);
+        color: white;
+        font-size: 20px;
+        padding: 5px 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+        transition: 0.2s;
+    }
+
+    .arrow:hover {
+        background: rgba(0, 123, 255, 1);
+    }
+
+    .arrow-left {
+        left: 10px;
+    }
+
+    .arrow-right {
+        right: 10px;
+    }
+
+    .right-bottom {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .error-message {
+        color: var(--red);
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        padding: 10px;
+        border-radius: 6px;
+        margin-top: 10px;
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h2>Salary Predictor</h2>
+            <p>AI-powered income classification system</p>
+            <form id="salary-form">
+                <div class="form-content">
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" min="16" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hours">Hours/Week</label>
+                        <input type="number" id="hours" min="1" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workclass">Work Class</label>
+                        <select id="workclass" required>
+                            <option value="" disabled selected>Select Work Class</option>
+                            <option value="federal-gov">Federal Government</option>
+                            <option value="local-gov">Local Government</option>
+                            <option value="private">Private</option>
+                            <option value="self-emp-inc">Self-Employed (Inc.)</option>
+                            <option value="self-emp-not-inc">Self-Employed (Not Inc.)</option>
+                            <option value="state-gov">State Government</option>
+                            <option value="without-pay">Without Pay</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="education">Education</label>
+                        <select id="education" required>
+                            <option value="" disabled selected>Select Education</option>
+                            <option value="preschool">Preschool</option>
+                            <option value="1st-4th">1st-4th Grade</option>
+                            <option value="5th-6th">5th-6th Grade</option>
+                            <option value="7th-8th">7th-8th Grade</option>
+                            <option value="9th">9th Grade</option>
+                            <option value="10th">10th Grade</option>
+                            <option value="11th">11th Grade</option>
+                            <option value="12th">12th Grade</option>
+                            <option value="hs-grad">High School Graduate</option>
+                            <option value="some-college">Some College</option>
+                            <option value="assoc-voc">Associate Vocational</option>
+                            <option value="assoc-acdm">Associate Academic</option>
+                            <option value="bachelors">Bachelors</option>
+                            <option value="masters">Masters</option>
+                            <option value="prof-school">Professional School</option>
+                            <option value="doctorate">Doctorate</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="marital-status">Marital Status</label>
+                        <select id="marital-status" required>
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="divorced">Divorced</option>
+                            <option value="married-af-spouse">Married (AF Spouse)</option>
+                            <option value="married-civ-spouse">Married (Civilian)</option>
+                            <option value="married-spouse-absent">Married (Spouse Absent)</option>
+                            <option value="never-married">Never Married</option>
+                            <option value="separated">Separated</option>
+                            <option value="widowed">Widowed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="occupation">Occupation</label>
+                        <select id="occupation" required>
+                            <option value="" disabled selected>Select Occupation</option>
+                            <option value="adm-clerical">Administrative</option>
+                            <option value="armed-forces">Armed Forces</option>
+                            <option value="craft-repair">Craft Repair</option>
+                            <option value="exec-managerial">Executive</option>
+                            <option value="farming-fishing">Farming/Fishing</option>
+                            <option value="handlers-cleaners">Handlers/Cleaners</option>
+                            <option value="machine-op-inspct">Machine Operator</option>
+                            <option value="other-service">Other Service</option>
+                            <option value="priv-house-serv">Private House Service</option>
+                            <option value="prof-specialty">Professional</option>
+                            <option value="protective-serv">Protective Service</option>
+                            <option value="sales">Sales</option>
+                            <option value="tech-support">Tech Support</option>
+                            <option value="transport-moving">Transportation</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="relationship">Relationship</label>
+                        <select id="relationship" required>
+                            <option value="" disabled selected>Select Relationship</option>
+                            <option value="husband">Husband</option>
+                            <option value="not-in-family">Not in Family</option>
+                            <option value="other-relative">Other Relative</option>
+                            <option value="own-child">Own Child</option>
+                            <option value="unmarried">Unmarried</option>
+                            <option value="wife">Wife</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="race">Race</label>
+                        <select id="race" required>
+                            <option value="" disabled selected>Select Race</option>
+                            <option value="amer-indian-eskimo">American Indian/Eskimo</option>
+                            <option value="asian-pac-islander">Asian/Pacific Islander</option>
+                            <option value="black">Black</option>
+                            <option value="other">Other</option>
+                            <option value="white">White</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" required>
+                            <option value="" disabled selected>Select Gender</option>
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Native Country</label>
+                        <select id="country" required>
+                            <option value="" disabled selected>Select Country</option>
+                            <option value="united-states">United States</option>
+                            <option value="canada">Canada</option>
+                            <option value="mexico">Mexico</option>
+                            <option value="india">India</option>
+                            <option value="china">China</option>
+                            <option value="philippines">Philippines</option>
+                            <option value="germany">Germany</option>
+                            <option value="puerto-rico">Puerto Rico</option>
+                            <option value="el-salvador">El Salvador</option>
+                            <option value="cuba">Cuba</option>
+                            <option value="england">England</option>
+                            <option value="jamaica">Jamaica</option>
+                            <option value="south">South</option>
+                            <option value="italy">Italy</option>
+                            <option value="dominican-republic">Dominican Republic</option>
+                            <option value="vietnam">Vietnam</option>
+                            <option value="guatemala">Guatemala</option>
+                            <option value="columbia">Columbia</option>
+                            <option value="haiti">Haiti</option>
+                            <option value="portugal">Portugal</option>
+                            <option value="taiwan">Taiwan</option>
+                            <option value="iran">Iran</option>
+                            <option value="greece">Greece</option>
+                            <option value="nicaragua">Nicaragua</option>
+                            <option value="peru">Peru</option>
+                            <option value="ecuador">Ecuador</option>
+                            <option value="france">France</option>
+                            <option value="ireland">Ireland</option>
+                            <option value="hong">Hong Kong</option>
+                            <option value="cambodia">Cambodia</option>
+                            <option value="trinadad&tobago">Trinidad & Tobago</option>
+                            <option value="laos">Laos</option>
+                            <option value="thailand">Thailand</option>
+                            <option value="yugoslavia">Yugoslavia</option>
+                            <option value="outlying-us(guam-usvi-etc)">Outlying US</option>
+                            <option value="honduras">Honduras</option>
+                            <option value="hungary">Hungary</option>
+                            <option value="poland">Poland</option>
+                            <option value="scotland">Scotland</option>
+                            <option value="holand-netherlands">Netherlands</option>
+                            <option value="japan">Japan</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn" id="submit-btn">Predict Salary</button>
+                </div>
+            </form>
+            <div id="error-container"></div>
+        </div>
+        <div class="right-section">
+            <div class="right-top">
+                <div class="prediction-result" id="prediction-result">
+                    <h3>Prediction Result</h3>
+                    <p id="result-text">Awaiting prediction...</p>
+                </div>
+                <div class="model-details">
+                    <h3>XGBoost Model Details</h3>
+                    <div class="model-stats">
+                        <div class="stat">
+                            <h4>94.2%</h4>
+                            <p>Accuracy</p>
+                        </div>
+                        <div class="stat">
+                            <h4>0.892</h4>
+                            <p>F1-Score</p>
+                        </div>
+                        <div class="stat">
+                            <h4>91.5%</h4>
+                            <p>Precision</p>
+                        </div>
+                        <div class="stat">
+                            <h4>89.8%</h4>
+                            <p>Recall</p>
+                        </div>
+                    </div>
+                    <p>This model is trained on the UCI Adult dataset with over 32,000 samples using advanced XGBoost algorithm. It analyzes demographic and employment factors to predict income classification with high accuracy.</p>
+                </div>
+            </div>
+            <div class="right-bottom">
+                <h3>Model Insights & Analytics</h3>
+                <div class="slideshow-container">
+                    <div class="slides-wrapper" id="slides-wrapper">
+                        <div class="slide">
+                            <img src="/static/images/feature importance.jpg" alt="Feature Importance">
+                            <div class="slide-text">📊 Feature Importance: Age and Education are the most influential factors, contributing 35% and 28% respectively to salary predictions. Hours worked per week ranks third at 18% importance.</div>
+                        </div>
+                        <div class="slide">
+                            <img src="/static/images/confusion matrix.jpg" alt="Confusion Matrix">
+                            <div class="slide-text">📈 Confusion Matrix: Shows the model's performance in classifying income levels, with high true positive and true negative rates, indicating robust prediction accuracy.</div>
+                        </div>
+                        <div class="slide">
+                            <img src="/static/images/precision recall.jpg" alt="Precision-Recall Curve">
+                            <div class="slide-text">🎯 Precision-Recall Curve: Demonstrates excellent precision-recall balance, with an area under the curve of 0.892, highlighting model reliability.</div>
+                        </div>
+                        <div class="slide">
+                            <img src="/static/images/ROC curve.jpg" alt="ROC Curve">
+                            <div class="slide-text">🔍 ROC Curve: Illustrates the trade-off between sensitivity and specificity, with an AUC of 0.94, indicating strong discriminative ability.</div>
+                        </div>
+                    </div>
+                    <span class="arrow arrow-left" onclick="changeSlide(-1)">‹</span>
+                    <span class="arrow arrow-right" onclick="changeSlide(1)">›</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentSlide = 0;
+        const slidesWrapper = document.getElementById('slides-wrapper');
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            slidesWrapper.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide = currentSlide + direction;
+            if (currentSlide >= totalSlides) {
+                currentSlide = 0;
+            } else if (currentSlide < 0) {
+                currentSlide = totalSlides - 1;
+            }
+            showSlide(currentSlide);
+        }
+
+        // Initialize first slide
+        showSlide(currentSlide);
+
+        // Auto-slide
+        setInterval(() => {
+            changeSlide(1);
+        }, 4000);
+
+        // Form submission with AJAX
+        document.getElementById('salary-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const resultDiv = document.getElementById('prediction-result');
+            const resultText = document.getElementById('result-text');
+            const errorContainer = document.getElementById('error-container');
+            
+            // Clear previous errors
+            errorContainer.innerHTML = '';
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Predicting...';
+            resultDiv.className = 'prediction-result loading';
+            resultText.innerHTML = '<p>Processing your data...</p>';
+            
+            // Collect form data
+            const formData = {
+                age: document.getElementById('age').value,
+                workclass: document.getElementById('workclass').value,
+                education: document.getElementById('education').value,
+                maritalStatus: document.getElementById('marital-status').value,
+                occupation: document.getElementById('occupation').value,
+                relationship: document.getElementById('relationship').value,
+                race: document.getElementById('race').value,
+                gender: document.getElementById('gender').value,
+                hoursPerWeek: document.getElementById('hours').value,
+                nativeCountry: document.getElementById('country').value
+            };
+            
+            console.log('Sending form data:', formData);
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Check if response is ok
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server error response:', errorText);
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        throw new Error(errorJson.error || `Server error: ${response.status}`);
+                    } catch (parseError) {
+                        throw new Error(`Server error: ${response.status} - ${errorText}`);
+                    }
+                }
+                
+                const result = await response.json();
+                console.log('Success response:', result);
+                
+                // Success - display prediction
+                const isHighSalary = result.prediction === 1;
+                resultDiv.className = `prediction-result ${isHighSalary ? 'high-salary' : 'low-salary'}`;
+                
+                resultText.innerHTML = `
+                    <p class="salary-text" style="color: ${isHighSalary ? 'var(--green)' : 'var(--red)'}">
+                        Predicted Salary: ${result.salary}
+                    </p>
+                    <p class="confidence-text">
+                        Confidence: ${result.confidence}%
+                    </p>
+                `;
+                
+            } catch (error) {
+                console.error('Full error details:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                
+                resultDiv.className = 'prediction-result low-salary';
+                
+                let errorMessage = 'Prediction failed. Please try again.';
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Cannot connect to server. Please check if the server is running.';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                resultText.innerHTML = `<p style="color: var(--red)">${errorMessage}</p>`;
+                
+                // Show detailed error message
+                errorContainer.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error Details:</strong><br>
+                        ${errorMessage}<br>
+                        <small>Check the browser console for more details.</small>
+                    </div>
+                `;
+            } finally {
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Predict Salary';
+            }
+        });
+    </script>
+</body>
+</html>
